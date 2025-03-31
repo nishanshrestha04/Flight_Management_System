@@ -1,0 +1,96 @@
+package bcu.cmp5332.bookingsystem.data;
+
+import bcu.cmp5332.bookingsystem.main.FlightBookingSystemException;
+import bcu.cmp5332.bookingsystem.model.Flight;
+import bcu.cmp5332.bookingsystem.model.FlightBookingSystem;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+/**
+ * Manages the loading and storing of flight data.
+ *
+ * @author Ashlesha Shrestha
+ * @author Nishan Shrestha
+ */
+public class FlightDataManager implements DataManager {
+
+    private final String RESOURCE = "./resources/data/flights.txt";
+    private static final String SEPARATOR = "::";
+
+    @Override
+    public void loadData(FlightBookingSystem fbs) throws IOException, FlightBookingSystemException {
+        try (Scanner sc = new Scanner(new File(RESOURCE))) {
+            int lineNumber = 1;
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                String[] properties = line.split(SEPARATOR, -1);
+                try {
+                    int id = Integer.parseInt(properties[0]);
+                    String flightNumber = properties[1];
+                    String origin = properties[2];
+                    String destination = properties[3];
+                    LocalDate departureDate = LocalDate.parse(properties[4]);
+                    int capacity = Integer.parseInt(properties[5]);
+                    double price = Double.parseDouble(properties[6]);
+                    double cancellationRebookFee = Double.parseDouble(properties[7]);
+                    int status = Integer.parseInt(properties[8]);
+
+                    Flight flight = new Flight(id, flightNumber, origin, destination, departureDate, capacity, price, cancellationRebookFee, status);
+                    fbs.addFlight(flight);
+                } catch (NumberFormatException ex) {
+                    throw new FlightBookingSystemException("Unable to parse flight data on line " + lineNumber + "\nError: " + ex);
+                }
+                lineNumber++;
+            }
+        }
+    }
+
+    @Override
+    public void storeData(FlightBookingSystem fbs) throws IOException {
+        try (PrintWriter out = new PrintWriter(new FileWriter(RESOURCE, false))) {
+            for (Flight flight : fbs.getFlights()) {
+                out.print(flight.getId() + SEPARATOR);
+                out.print(flight.getFlightNumber() + SEPARATOR);
+                out.print(flight.getOrigin() + SEPARATOR);
+                out.print(flight.getDestination() + SEPARATOR);
+                out.print(flight.getDepartureDate() + SEPARATOR);
+                out.print(flight.getCapacity() + SEPARATOR);
+                out.print(flight.getPrice() + SEPARATOR);
+                out.print(flight.getCancellationRebookFee() + SEPARATOR);
+                out.print(flight.getStatus() + SEPARATOR);
+                out.println();
+            }
+        }
+    }
+
+    /**
+     * Removes a flight from the file based on the flight ID.
+     *
+     * @param fbs the flight booking system
+     * @param flightId the ID of the flight to be removed
+     * @throws IOException if an I/O error occurs
+     */
+    public void removeFlightFromFile(FlightBookingSystem fbs, int flightId) throws IOException {
+        File file = new File(RESOURCE);
+        List<String> lines = new ArrayList<>();
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
+                lines.add(scanner.nextLine());
+            }
+        }
+
+        lines.removeIf(line -> line.split(SEPARATOR)[0].equals(String.valueOf(flightId)));
+
+        try (PrintWriter out = new PrintWriter(new FileWriter(file, false))) {
+            for (String line : lines) {
+                out.println(line);
+            }
+        }
+    }
+}
