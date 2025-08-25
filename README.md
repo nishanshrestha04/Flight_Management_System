@@ -146,8 +146,8 @@ Data is stored in text files within the resources/data/ directory using :: as a 
   - `status: 1 = active, 0 = cancelled`
 
 # Authors
-- `Ashlesha Shrestha - Ashlesha.Shrestha@mail.bcu.ac.uk (Student ID: 24128474)`
-- `Nishan Shrestha - Nishan.Shrestha@mail.bcu.ac.uk (Student ID: 24128429)`
+- `Ashlesha Shrestha - ashleshashrestha04@gmail.com`
+- `Nishan Shrestha - nishanshrestha212@gmail.com`
 
 `Project Supervisor: Sumanta Silwal`
 
